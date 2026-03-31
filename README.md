@@ -29,6 +29,8 @@ Slack: Create a Slack App with chat:write scopes and invite it to your alerts ch
 Gemini: Obtain an API Key from Google AI Studio.
 
 ---
+![Architecture Diagram](Observability pipeline.png)
+
 
 ## Local Testing:
 Start a mock server in Mockoon.
