@@ -34,7 +34,7 @@ Gemini: Obtain an API Key from Google AI Studio.
 Start a mock server in Mockoon.
 Run ngrok http 3000 (or your mock port) to expose the service to n8n.
 
--
+---
 
 <p align="center">
   <img src="Observability pipeline.png" alt="Architecture Diagram" width="800">
