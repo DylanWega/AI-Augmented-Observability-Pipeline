@@ -1,0 +1,203 @@
+{
+  "name": "augmented-observability",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        0,
+        0
+      ],
+      "id": "48512ee9-effc-4ae1-a123-f33a4da23656",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://auriscopically-trogonoid-adah.ngrok-free.dev/products",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        208,
+        0
+      ],
+      "id": "67506ee6-191e-49e7-a0b4-aa799056cd94",
+      "name": "HTTP Request",
+      "retryOnFail": false,
+      "maxTries": 5,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "fe908e63-24a1-418e-bdfb-00f8725f3586",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        416,
+        0
+      ],
+      "id": "81d37691-8856-401a-9a7e-7a48a7c511d3",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-2.5-flash",
+          "mode": "list",
+          "cachedResultName": "models/gemini-2.5-flash"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are an application support analyst.\nAn error has occured. {{ $json.error.message }}\nIn 3 points and clean format(no bold text) summarise what likely cause it and suggest a resolution.\nBe brief.  "
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        592,
+        -112
+      ],
+      "id": "226563b1-d6d2-4027-beb9-dea343c756ff",
+      "name": "Message a model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "6OFp7tUkKQDSDIAL",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0ANSBJF9J7",
+          "mode": "list",
+          "cachedResultName": "site-observability"
+        },
+        "text": "={{ $json.content.parts[0].text }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.4,
+      "position": [
+        960,
+        -160
+      ],
+      "id": "84695a5d-2aef-4585-8e80-7c0a60bfbe45",
+      "name": "Send a message",
+      "webhookId": "a007959f-1425-46ac-9534-0c5eab1588cc",
+      "credentials": {
+        "slackApi": {
+          "id": "56TbZRB6D9lkEDkl",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "6078db82-9f55-45f2-b74c-58fd4ca39c97",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c0d2867b2b7ca764b36dcbb64b62d63a77a3dc4b66254317fe2d146194e83bf6"
+  },
+  "id": "nP0WAM26FSmgsqa1",
+  "tags": []
+}
